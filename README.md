@@ -1,2 +1,2 @@
-# opcache
-PSR-6 OpCache Adapter
+# PSR-6 OpCache Adapter
+
