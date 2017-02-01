@@ -6,6 +6,7 @@ OPcache improves PHP performance by storing precompiled script bytecode
 in shared memory, thereby removing the need for PHP to load and
 parse scripts on each request.
 
+This library is inspired by this amazing [blog entry](https://blog.graphiq.com/500x-faster-caching-than-redis-memcache-apc-in-php-hhvm-dcd26e8447ad#.tsokdw9d4).
 
 [![Latest Version](https://img.shields.io/github/release/odan/cache.svg)](https://github.com/loadsys/odan/cache/releases)
 [![Build Status](https://travis-ci.org/odan/cache.svg?branch=master)](https://travis-ci.org/odan/cache)
