@@ -1,7 +1,7 @@
 {
     "name": "odan/cache",
     "type": "library",
-    "description": "PHP OpCache component with PSR-16 Simple Cache Interface",
+    "description": "PHP OpCache implementation of PSR-16 Simple Cache Interface",
     "keywords": [
         "caching",
         "cache",
