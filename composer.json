@@ -1,5 +1,5 @@
 {
-    "name": "odan/opcache",
+    "name": "odan/cache",
     "type": "library",
     "description": "PHP OpCache component with PSR-16",
     "keywords": [
@@ -9,7 +9,7 @@
         "psr-16",
         "opcache"
     ],
-    "homepage": "http://github.com/odan/opcache",
+    "homepage": "http://github.com/odan/cache",
     "license": "MIT",
     "authors": [
         {
