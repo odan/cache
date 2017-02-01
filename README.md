@@ -28,9 +28,9 @@ $cachePath = sys_get_temp_dir() . '/opcache';
 
 $cache = new \Odan\Cache\Simple\OpCache($cachePath);
 
-// set a cache value
+// set a opcache value
 $cache->set('foo', 'bar');
 
-// get a cache value
-echo $cache->set('foo'); // bar
+// get a opcache value
+echo $cache->get('foo'); // bar
 ```
