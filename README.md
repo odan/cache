@@ -15,8 +15,8 @@ PHP is an interpreted language. The default PHP runtime compiles PHP sourcecode 
 
 The basic idea, when executing a PHP script is in two steps:
 
-* First: the PHP code, written in plain-text, is compiled to opcodes
-* Then: those opcodes are executed.
+* First: the PHP code, written in plain-text, is *compiled to opcodes*
+* Then: those *opcodes are executed*.
 
 When you have one PHP script, as long as it is not modified, the opcodes will always be the same ; so, doing the compilation phase each time that script is to be executed is kind of a waste of CPU-time.
 
