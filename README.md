@@ -1,6 +1,6 @@
 # OpCache Adapter (PSR-16 )
 
-PSR-16 Simple Cache Implementation.
+A PSR-16 Simple Cache Implementation.
 
 [![Latest Version](https://img.shields.io/github/release/odan/cache.svg)](https://github.com/loadsys/odan/cache/releases)
 [![Build Status](https://travis-ci.org/odan/cache.svg?branch=master)](https://travis-ci.org/odan/cache)
