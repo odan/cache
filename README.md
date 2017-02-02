@@ -25,7 +25,7 @@ composer require odan/cache
 ## Usage
 
 ```php
-$cachePath = sys_get_temp_dir() . '/opcache';
+$cachePath = sys_get_temp_dir() . '/cache';
 
 $cache = new \Odan\Cache\Simple\OpCache($cachePath);
 
