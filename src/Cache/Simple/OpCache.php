@@ -36,7 +36,7 @@ class OpCache implements CacheInterface
         if (isset($path)) {
             $this->path = $path;
         } else {
-            $this->path = sys_get_temp_dir() . '/opcache';
+            $this->path = sys_get_temp_dir() . '/cache';
         }
         if (!file_exists($this->path)) {
             mkdir($this->path, 0775, true);
@@ -194,12 +194,12 @@ class OpCache implements CacheInterface
     /**
      * Get cache filename.
      *
-     * @param mixed $key
+     * @param string $key Key
      * @return string Filename
      */
     protected function getFilename($key)
     {
-        $sha1 = sha1(implode('', (array) $key));
+        $sha1 = sha1($key);
         $result = $this->path . '/' . substr($sha1, 0, 2) . '/' . substr($sha1, 2) . '.php';
         return $result;
     }
@@ -209,7 +209,7 @@ class OpCache implements CacheInterface
      *
      * @param mixed $key The cache key the file is stored under.
      * @param mixed $value The data being stored
-     * @param int $ttl The timestamp of when the data will expire.  If null, the data won't expire.
+     * @param int $ttl The timestamp of when the data will expire. If null, the data won't expire.
      * @return array Cache value
      */
     protected function createCacheValue($key, $value, $ttl = null)
@@ -230,12 +230,12 @@ class OpCache implements CacheInterface
      */
     protected function isExpired($expires)
     {
-        //value doesn't expire
+        // value doesn't expire
         if (!$expires) {
             return false;
         }
 
-        //if it is after the expire time
+        // if it's after the expire time
         return time() > $expires;
     }
 }
