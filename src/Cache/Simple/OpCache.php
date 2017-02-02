@@ -207,7 +207,7 @@ class OpCache implements CacheInterface
     /**
      * Creates a FileSystemCacheValue object.
      *
-     * @param mixed $key The cache key the file is stored under.
+     * @param string $key The cache key the file is stored under.
      * @param mixed $value The data being stored
      * @param int $ttl The timestamp of when the data will expire. If null, the data won't expire.
      * @return array Cache value
