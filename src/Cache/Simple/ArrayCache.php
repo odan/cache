@@ -52,7 +52,7 @@ class ArrayCache implements CacheInterface
 
         $cacheValue = $this->data[$key];
         if ($this->isExpired($cacheValue['expires'])) {
-            $this->remove($key);
+            $this->delete($key);
             return $default;
         }
         $result = isset($cacheValue['value']) ? $cacheValue['value'] : $default;
@@ -125,7 +125,7 @@ class ArrayCache implements CacheInterface
         }
         $cacheValue = $this->data[$key];
         if ($this->isExpired($cacheValue['expires'])) {
-            $this->remove($key);
+            $this->delete($key);
             return false;
         }
         return true;
