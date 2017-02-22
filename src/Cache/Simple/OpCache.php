@@ -88,7 +88,7 @@ class OpCache implements CacheInterface
         }
         $cacheValue = include $filename;
         if ($this->isExpired($cacheValue['expires'])) {
-            $this->remove($key);
+            $this->delete($key);
             return $default;
         }
         $result = isset($cacheValue['value']) ? $cacheValue['value'] : $default;
@@ -162,7 +162,7 @@ class OpCache implements CacheInterface
         }
         $cacheValue = include $filename;
         if ($this->isExpired($cacheValue['expires'])) {
-            $this->remove($key);
+            $this->delete($key);
             return false;
         }
         return true;
