@@ -54,7 +54,8 @@ echo $cache->get('foo'); // bar
 
 > Fatal error: Call to undefined method stdClass::__set_state()
 
-If there are objects in the config tree, they will be written as stdClass::__set_state(). This is fine for objects where __set_state() can be added, but it can't be added to stdClass. This causes the site to fail, but only when that is cached.
+If there are objects in the value, they will be written as `stdClass::__set_state()`. 
+This is fine for objects where __set_state() can be added, but it can't be added to stdClass.
 
 To fix this issue just serialize the value you are trying to cache:
 
