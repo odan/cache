@@ -49,3 +49,22 @@ $cache->set('foo', 'bar');
 // get a opcache value
 echo $cache->get('foo'); // bar
 ```
+
+## Known issues
+
+> Fatal error: Call to undefined method stdClass::__set_state()
+
+If there are objects in the config tree, they will be written as stdClass::__set_state(). This is fine for objects where __set_state() can be added, but it can't be added to stdClass. This causes the site to fail, but only when that is cached.
+
+To fix this issue just serialize the value you are trying to cache:
+
+```php
+$cache->set('key', serialize($object));
+```
+
+Then unserialize the string back to the original value:
+
+```php
+$object = unserialize($cache->get('key'));
+```
+
