@@ -3,6 +3,7 @@
 namespace Odan\Cache\Simple;
 
 use DateInterval;
+use DateTime;
 use Odan\Cache\Exception\InvalidArgumentException;
 use Psr\SimpleCache\CacheInterface;
 use Traversable;
@@ -15,7 +16,7 @@ class ArrayCache implements CacheInterface
     /**
      * Array cache
      *
-     * @var string
+     * @var array
      */
     protected $data = array();
 
@@ -27,6 +28,7 @@ class ArrayCache implements CacheInterface
         if (!is_string($key)) {
             throw new InvalidArgumentException();
         }
+
         if ($ttl instanceof DateInterval) {
             // Converting to a TTL in seconds
             $ttl = (new DateTime('now'))->add($ttl)->getTimeStamp() - time();
