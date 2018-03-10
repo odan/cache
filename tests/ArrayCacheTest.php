@@ -3,6 +3,7 @@
 namespace Odan\Test;
 
 use Odan\Cache\Simple\ArrayCache;
+use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_TestCase;
 
 /**
@@ -10,7 +11,7 @@ use PHPUnit_Framework_TestCase;
  *
  * @coversDefaultClass Odan\Cache\Simple\ArrayCache
  */
-class ArrayCacheTest extends PHPUnit_Framework_TestCase
+class ArrayCacheTest extends TestCase
 {
     protected $cache;
 
@@ -115,5 +116,4 @@ class ArrayCacheTest extends PHPUnit_Framework_TestCase
 
         $this->assertSame($values, $actual);
     }
-
 }

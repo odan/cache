@@ -3,8 +3,8 @@
 namespace Odan\Cache\Simple;
 
 use DateInterval;
-use Psr\SimpleCache\CacheInterface;
 use Odan\Cache\Exception\InvalidArgumentException;
+use Psr\SimpleCache\CacheInterface;
 use Traversable;
 
 /**
@@ -32,7 +32,7 @@ class ArrayCache implements CacheInterface
             $ttl = (new DateTime('now'))->add($ttl)->getTimeStamp() - time();
         }
 
-        $cacheValue = $this->createCacheValue($key, $value, (int) $ttl);
+        $cacheValue = $this->createCacheValue($key, $value, (int)$ttl);
         $this->data[$key] = $cacheValue;
 
         return true;
@@ -53,9 +53,11 @@ class ArrayCache implements CacheInterface
         $cacheValue = $this->data[$key];
         if ($this->isExpired($cacheValue['expires'])) {
             $this->delete($key);
+
             return $default;
         }
         $result = isset($cacheValue['value']) ? $cacheValue['value'] : $default;
+
         return $result;
     }
 
@@ -69,9 +71,10 @@ class ArrayCache implements CacheInterface
         }
 
         $result = array();
-        foreach ((array) $keys as $key) {
+        foreach ((array)$keys as $key) {
             $result[$key] = $this->has($key) ? $this->get($key) : $default;
         }
+
         return $result;
     }
 
@@ -89,7 +92,7 @@ class ArrayCache implements CacheInterface
             $ttl = (new DateTime('now'))->add($ttl)->getTimeStamp() - time();
         }
 
-        foreach ((array) $values as $key => $value) {
+        foreach ((array)$values as $key => $value) {
             $this->set($key, $value, $ttl);
         }
 
@@ -105,7 +108,7 @@ class ArrayCache implements CacheInterface
             throw new InvalidArgumentException();
         }
 
-        foreach ((array) $keys as $key) {
+        foreach ((array)$keys as $key) {
             $this->delete($key);
         }
 
@@ -120,14 +123,16 @@ class ArrayCache implements CacheInterface
         if (!is_string($key)) {
             throw new InvalidArgumentException();
         }
-       if (!array_key_exists($key, $this->data)) {
+        if (!array_key_exists($key, $this->data)) {
             return false;
         }
         $cacheValue = $this->data[$key];
         if ($this->isExpired($cacheValue['expires'])) {
             $this->delete($key);
+
             return false;
         }
+
         return true;
     }
 
@@ -137,6 +142,7 @@ class ArrayCache implements CacheInterface
     public function delete($key)
     {
         unset($this->data[$key]);
+
         return true;
     }
 
@@ -146,6 +152,7 @@ class ArrayCache implements CacheInterface
     public function clear()
     {
         $this->data = array();
+
         return true;
     }
 
@@ -160,6 +167,7 @@ class ArrayCache implements CacheInterface
     protected function createCacheValue($key, $value, $ttl = null)
     {
         $created = time();
+
         return array(
             'created' => $created,
             'key' => $key,
@@ -183,5 +191,4 @@ class ArrayCache implements CacheInterface
         // if it's after the expire time
         return time() > $expires;
     }
-
 }

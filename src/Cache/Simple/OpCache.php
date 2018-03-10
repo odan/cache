@@ -3,11 +3,11 @@
 namespace Odan\Cache\Simple;
 
 use DateInterval;
-use RecursiveIteratorIterator;
 use FilesystemIterator;
-use RecursiveDirectoryIterator;
-use Psr\SimpleCache\CacheInterface;
 use Odan\Cache\Exception\InvalidArgumentException;
+use Psr\SimpleCache\CacheInterface;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use Traversable;
 
 /**
@@ -62,14 +62,12 @@ class OpCache implements CacheInterface
             mkdir($path, 0775, true);
         }
 
-        $cacheValue = $this->createCacheValue($key, $value, (int) $ttl);
+        $cacheValue = $this->createCacheValue($key, $value, (int)$ttl);
         $content = var_export($cacheValue, true);
-
-        // HHVM fails at __set_state, so just use object cast for now
-        $content = str_replace('stdClass::__set_state', '(object)', $content);
         $content = '<?php return ' . $content . ';';
 
         file_put_contents($cacheFile, $content);
+        touch($cacheFile, $cacheValue['expires']);
 
         return true;
     }
@@ -86,12 +84,16 @@ class OpCache implements CacheInterface
         if (!file_exists($filename)) {
             return $default;
         }
-        $cacheValue = include $filename;
-        if ($this->isExpired($cacheValue['expires'])) {
+
+        if ($this->isExpired(filemtime($filename))) {
             $this->delete($key);
+
             return $default;
         }
+
+        $cacheValue = include $filename;
         $result = isset($cacheValue['value']) ? $cacheValue['value'] : $default;
+
         return $result;
     }
 
@@ -105,9 +107,10 @@ class OpCache implements CacheInterface
         }
 
         $result = array();
-        foreach ((array) $keys as $key) {
+        foreach ((array)$keys as $key) {
             $result[$key] = $this->has($key) ? $this->get($key) : $default;
         }
+
         return $result;
     }
 
@@ -125,7 +128,7 @@ class OpCache implements CacheInterface
             $ttl = (new DateTime('now'))->add($ttl)->getTimeStamp() - time();
         }
 
-        foreach ((array) $values as $key => $value) {
+        foreach ((array)$values as $key => $value) {
             $this->set($key, $value, $ttl);
         }
 
@@ -141,7 +144,7 @@ class OpCache implements CacheInterface
             throw new InvalidArgumentException();
         }
 
-        foreach ((array) $keys as $key) {
+        foreach ((array)$keys as $key) {
             $this->delete($key);
         }
 
@@ -160,11 +163,13 @@ class OpCache implements CacheInterface
         if (!file_exists($filename)) {
             return false;
         }
-        $cacheValue = include $filename;
-        if ($this->isExpired($cacheValue['expires'])) {
+
+        if ($this->isExpired(filemtime($filename))) {
             $this->delete($key);
+
             return false;
         }
+
         return true;
     }
 
@@ -177,6 +182,7 @@ class OpCache implements CacheInterface
         if (file_exists($filename)) {
             unlink($filename);
         }
+
         return true;
     }
 
@@ -185,9 +191,11 @@ class OpCache implements CacheInterface
      */
     public function clear()
     {
-        foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->path, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST) as $path) {
+        $iterator = new RecursiveDirectoryIterator($this->path, FilesystemIterator::SKIP_DOTS);
+        foreach (new RecursiveIteratorIterator($iterator, RecursiveIteratorIterator::CHILD_FIRST) as $path) {
             $path->isDir() && !$path->isLink() ? rmdir($path->getPathname()) : unlink($path->getPathname());
         }
+
         return true;
     }
 
@@ -201,6 +209,7 @@ class OpCache implements CacheInterface
     {
         $sha1 = sha1($key);
         $result = $this->path . '/' . substr($sha1, 0, 2) . '/' . substr($sha1, 2) . '.php';
+
         return $result;
     }
 
@@ -215,6 +224,7 @@ class OpCache implements CacheInterface
     protected function createCacheValue($key, $value, $ttl = null)
     {
         $created = time();
+
         return array(
             'created' => $created,
             'key' => $key,

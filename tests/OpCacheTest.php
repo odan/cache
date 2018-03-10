@@ -30,5 +30,4 @@ class OpCacheTest extends ArrayCacheTest
     {
         $this->assertInstanceOf(OpCache::class, $this->cache);
     }
-
 }
