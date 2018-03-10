@@ -6,5 +6,4 @@ use Psr\SimpleCache\InvalidArgumentException as SimpleCacheInvalidArgumentExcept
 
 class InvalidArgumentException extends \Exception implements SimpleCacheInvalidArgumentException
 {
-
 }
