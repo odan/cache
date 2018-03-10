@@ -3,6 +3,7 @@
 namespace Odan\Cache\Simple;
 
 use DateInterval;
+use DateTime;
 use FilesystemIterator;
 use Odan\Cache\Exception\InvalidArgumentException;
 use Psr\SimpleCache\CacheInterface;
