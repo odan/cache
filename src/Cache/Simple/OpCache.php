@@ -28,6 +28,27 @@ class OpCache implements CacheInterface
     protected $path = '';
 
     /**
+     * Status
+     *
+     * @var bool Status
+     */
+    protected $hasCompileFile = false;
+
+    /**
+     * File modification time
+     *
+     * @var int File modification time in seconds
+     */
+    protected $fileModifiedOffset = 86400;
+
+    /**
+     * Chmod mode.
+     *
+     * @var int Mode
+     */
+    protected $chmod = 0775;
+
+    /**
      * Constructor
      *
      * @param string $path Cache path
@@ -40,8 +61,10 @@ class OpCache implements CacheInterface
             $this->path = sys_get_temp_dir() . '/cache';
         }
         if (!file_exists($this->path)) {
-            mkdir($this->path, 0775, true);
+            mkdir($this->path, $this->chmod, true);
         }
+
+        $this->hasCompileFile = function_exists('opcache_compile_file');
     }
 
     /**
@@ -60,15 +83,23 @@ class OpCache implements CacheInterface
         $cacheFile = $this->getFilename($key);
         $path = dirname($cacheFile);
         if (!is_dir($path)) {
-            mkdir($path, 0775, true);
+            mkdir($path, $this->chmod, true);
         }
 
-        $cacheValue = $this->createCacheValue($key, $value, (int)$ttl);
+        $cacheValue = $this->createCacheValue($key, $value, $ttl);
         $content = var_export($cacheValue, true);
         $content = '<?php return ' . $content . ';';
 
         file_put_contents($cacheFile, $content);
-        touch($cacheFile, $cacheValue['expires']);
+
+        // opcache will only compile and cache files older than the script execution start.
+        // set a date before the script execution date, then opcache will compile and cache the generated file.
+        touch($cacheFile, time() - $this->fileModifiedOffset);
+
+        // This php extension is not enabled by default on windows. We must check it.
+        if ($this->hasCompileFile) {
+            opcache_compile_file($cacheFile);
+        }
 
         return true;
     }
@@ -86,13 +117,14 @@ class OpCache implements CacheInterface
             return $default;
         }
 
-        if ($this->isExpired(filemtime($filename))) {
+        $cacheValue = include $filename;
+
+        if ($this->isExpired($cacheValue['expires'])) {
             $this->delete($key);
 
             return $default;
         }
 
-        $cacheValue = include $filename;
         $result = isset($cacheValue['value']) ? $cacheValue['value'] : $default;
 
         return $result;
@@ -165,7 +197,9 @@ class OpCache implements CacheInterface
             return false;
         }
 
-        if ($this->isExpired(filemtime($filename))) {
+        $cacheValue = include $filename;
+
+        if ($this->isExpired($cacheValue['expires'])) {
             $this->delete($key);
 
             return false;
@@ -215,11 +249,11 @@ class OpCache implements CacheInterface
     }
 
     /**
-     * Creates a FileSystemCacheValue object.
+     * Creates a cache value object.
      *
      * @param string $key The cache key the file is stored under.
      * @param mixed $value The data being stored
-     * @param int $ttl The timestamp of when the data will expire. If null, the data won't expire.
+     * @param int|null $ttl The timestamp of when the data will expire. If null, the data won't expire.
      * @return array Cache value
      */
     protected function createCacheValue($key, $value, $ttl = null)
@@ -236,8 +270,9 @@ class OpCache implements CacheInterface
     }
 
     /**
-     * Checks if a value is expired
-     * @return bool True if the value is expired.  False if it is not.
+     * Checks if a value is expired.
+     *
+     * @return bool True if the value is expired.
      */
     protected function isExpired($expires)
     {

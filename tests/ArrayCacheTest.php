@@ -4,6 +4,7 @@ namespace Odan\Test;
 
 use Odan\Cache\Simple\ArrayCache;
 use PHPUnit\Framework\TestCase;
+use Psr\SimpleCache\CacheInterface;
 
 /**
  * OpCacheTest
@@ -12,6 +13,10 @@ use PHPUnit\Framework\TestCase;
  */
 class ArrayCacheTest extends TestCase
 {
+
+    /**
+     * @var CacheInterface
+     */
     protected $cache;
 
     protected function setUp()
@@ -30,13 +35,11 @@ class ArrayCacheTest extends TestCase
 
     /**
      * Test.
-     *
-     * @covers ::set
-     * @covers ::has
      */
     public function testHasByStringKey()
     {
         $this->cache->set('key', 'value');
+        sleep(1);
         $this->assertTrue($this->cache->has('key'));
     }
 
@@ -54,6 +57,7 @@ class ArrayCacheTest extends TestCase
     public function testGetByStringKey()
     {
         $this->cache->set('strkey', 'str key value');
+        sleep(1);
         $this->assertEquals('str key value', $this->cache->get('strkey'));
     }
 
@@ -62,7 +66,6 @@ class ArrayCacheTest extends TestCase
      *
      * @expectedException \Psr\SimpleCache\InvalidArgumentException
      * @expectedExceptionMessage_ Cannot throw objects that do not implement Throwable
-     * @covers ::set
      */
     public function testSetByIntKey()
     {
@@ -72,6 +75,7 @@ class ArrayCacheTest extends TestCase
     public function testDelete()
     {
         $this->cache->set('fordeletekey', 'value');
+        sleep(1);
         $this->assertTrue($this->cache->has('fordeletekey'));
         $this->cache->delete('fordeletekey');
         $this->assertFalse($this->cache->has('fordeletekey'));
@@ -80,6 +84,7 @@ class ArrayCacheTest extends TestCase
     public function testHasStringKey()
     {
         $this->cache->set('key', 'value');
+        sleep(1);
         $this->assertTrue($this->cache->has('key'));
     }
 
@@ -107,6 +112,7 @@ class ArrayCacheTest extends TestCase
         $keys = array_keys($values);
 
         $this->cache->setMultiple($values);
+        sleep(1);
         $actual = $this->cache->getMultiple($keys);
 
         $this->assertSame($values, $actual);
