@@ -73,7 +73,6 @@ class OpCacheTest extends ArrayCacheTest
 
         $this->cache->delete($key);
         $this->assertFileNotExists($cacheFile);
-        $this->assertFalse(opcache_is_script_cached($cacheFile));
     }
 
     /**
