@@ -69,3 +69,6 @@ Then unserialize the string back to the original value:
 $object = unserialize($cache->get('key'));
 ```
 
+## Alternative OPcache implementations
+
+* [Symonfy Php Files Cache Adapter](https://symfony.com/doc/current/components/cache/adapters/php_files_adapter.html)
