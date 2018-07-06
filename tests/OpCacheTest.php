@@ -9,6 +9,21 @@ use Psr\SimpleCache\CacheInterface;
  * OpCacheTest
  *
  * @coversDefaultClass \Odan\Cache\Simple\OpCache
+ *
+ * Setup
+ *
+ * php.ini
+ *
+ * linux
+ * zend_extension="opcache"
+ *
+ * windows:
+ * zend_extension="c:\xampp\php\ext\php_opcache.dll"
+ *
+ * [opcache]
+ * opcache.enable=1
+ * opcache.enable_cli=1
+ *
  */
 class OpCacheTest extends ArrayCacheTest
 {
@@ -53,7 +68,12 @@ class OpCacheTest extends ArrayCacheTest
         sleep(1);
 
         $cacheFile = $this->getCacheFilename($key);
+        $this->assertFileExists($cacheFile);
         $this->assertTrue(opcache_is_script_cached($cacheFile));
+
+        $this->cache->delete($key);
+        $this->assertFileNotExists($cacheFile);
+        $this->assertFalse(opcache_is_script_cached($cacheFile));
     }
 
     /**
