@@ -64,7 +64,7 @@ class OpCache implements CacheInterface
             mkdir($this->path, $this->chmod, true);
         }
 
-        $this->hasCompileFile = function_exists('opcache_compile_file');
+        $this->hasCompileFile = function_exists('opcache_compile_file') && !empty(opcache_get_status());
     }
 
     /**
