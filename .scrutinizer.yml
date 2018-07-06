@@ -24,3 +24,11 @@ tools:
     external_code_coverage:
         timeout: 600
         runs: 1
+
+build:
+    environment:
+        php:
+            version: '7.2'
+            ini:
+                'opcache.enable': '1'
+                'opcache.enable_cli': '1'
