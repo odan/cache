@@ -9,13 +9,13 @@
     "psr-16",
     "opcache"
   ],
-  "homepage": "http://github.com/odan/cache",
+  "homepage": "https://github.com/odan/cache",
   "license": "MIT",
   "authors": [
     {
       "name": "odan",
       "email": "odan@users.noreply.github.com",
-      "homepage": "https://github.com/odan/opcache",
+      "homepage": "https://github.com/odan/cache",
       "role": "Developer"
     }
   ],
@@ -36,12 +36,12 @@
   },
   "autoload": {
     "psr-4": {
-      "Odan\\": "src"
+      "Odan\\Cache\\": "src/Cache/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Odan\\Test\\": "tests"
+      "Odan\\Cache\\Test\\": "tests/"
     }
   },
   "config": {
