@@ -4,12 +4,11 @@ namespace Odan\Test;
 
 use Odan\Cache\Simple\ArrayCache;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_TestCase;
 
 /**
  * OpCacheTest
  *
- * @coversDefaultClass Odan\Cache\Simple\ArrayCache
+ * @coversDefaultClass \Odan\Cache\Simple\ArrayCache
  */
 class ArrayCacheTest extends TestCase
 {
@@ -46,7 +45,6 @@ class ArrayCacheTest extends TestCase
      *
      * @expectedException \Psr\SimpleCache\InvalidArgumentException
      * @expectedExceptionMessage_ Cannot throw objects that do not implement Throwable
-     * @covers ::get
      */
     public function testGetInvalidKey()
     {
@@ -102,9 +100,6 @@ class ArrayCacheTest extends TestCase
 
     /**
      * Test.
-     *
-     * @covers ::setMultiple
-     * @covers ::getMultiple
      */
     public function testMultiple()
     {

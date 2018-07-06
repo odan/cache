@@ -7,7 +7,7 @@ use Odan\Cache\Simple\OpCache;
 /**
  * OpCacheTest
  *
- * @coversDefaultClass Odan\Cache\Simple\OpCache
+ * @coversDefaultClass \Odan\Cache\Simple\OpCache
  */
 class OpCacheTest extends ArrayCacheTest
 {
@@ -29,5 +29,10 @@ class OpCacheTest extends ArrayCacheTest
     public function testInstanceOf()
     {
         $this->assertInstanceOf(OpCache::class, $this->cache);
+    }
+
+    public function testOpCacheExtension()
+    {
+        $this->assertTrue(function_exists('opcache_compile_file'));
     }
 }
