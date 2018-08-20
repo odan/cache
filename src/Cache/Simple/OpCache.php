@@ -90,7 +90,9 @@ class OpCache implements CacheInterface
         $content = var_export($cacheValue, true);
         $content = '<?php return ' . $content . ';';
 
-        file_put_contents($cacheFile, $content);
+        // Acquire an exclusive lock on the file while proceeding to the writing.
+        // In other words, a flock() call happens between the fopen() call and the fwrite() call.
+        file_put_contents($cacheFile, $content, LOCK_EX);
 
         // opcache will only compile and cache files older than the script execution start.
         // set a date before the script execution date, then opcache will compile and cache the generated file.
@@ -98,6 +100,7 @@ class OpCache implements CacheInterface
 
         // This php extension is not enabled by default on windows. We must check it.
         if ($this->hasCompileFile) {
+            opcache_invalidate($cacheFile);
             opcache_compile_file($cacheFile);
         }
 
@@ -117,7 +120,13 @@ class OpCache implements CacheInterface
             return $default;
         }
 
+        // Acquire a read lock (shared locked)
+        $myfile = fopen($filename, 'rt');
+        flock($myfile, LOCK_SH);
+
         $cacheValue = include $filename;
+
+        fclose($myfile);
 
         if ($this->isExpired($cacheValue['expires'])) {
             $this->delete($key);
