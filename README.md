@@ -6,7 +6,7 @@ A PSR-16 Simple Cache Implementation.
 [![Build Status](https://travis-ci.org/odan/cache.svg?branch=master)](https://travis-ci.org/odan/cache)
 [![Crutinizer](https://img.shields.io/scrutinizer/g/odan/cache.svg)](https://scrutinizer-ci.com/g/odan/cache)
 [![Coverage Status](https://scrutinizer-ci.com/g/odan/cache/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/odan/cache/code-structure)
-[![Total Downloads](https://img.shields.io/packagist/dt/odan/cache.svg)](https://packagist.org/packages/odan/cache)
+[![Total Downloads](https://img.shields.io/packagist/dt/odan/cache.svg)](https://packagist.org/packages/odan/cache/stats)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.md)
 
 ## Out-of-the-Box Bytecode Cache
