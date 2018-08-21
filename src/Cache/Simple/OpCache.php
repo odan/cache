@@ -9,6 +9,7 @@ use Odan\Cache\Exception\InvalidArgumentException;
 use Psr\SimpleCache\CacheInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use RuntimeException;
 use Traversable;
 
 /**
@@ -60,9 +61,9 @@ class OpCache implements CacheInterface
         } else {
             $this->path = sys_get_temp_dir() . '/cache';
         }
-        if (!file_exists($this->path)) {
-            mkdir($this->path, $this->chmod, true);
-        }
+
+        // A more atomic option when creating directories
+        @mkdir($this->path, $this->chmod, true);
 
         $this->hasCompileFile = function_exists('opcache_compile_file') && !empty(opcache_get_status());
     }
@@ -73,7 +74,7 @@ class OpCache implements CacheInterface
     public function set($key, $value, $ttl = null)
     {
         if (!is_string($key)) {
-            throw new InvalidArgumentException();
+            throw new InvalidArgumentException('Invalid key');
         }
         if ($ttl instanceof DateInterval) {
             // Converting to a TTL in seconds
@@ -82,27 +83,40 @@ class OpCache implements CacheInterface
 
         $cacheFile = $this->getFilename($key);
         $path = dirname($cacheFile);
-        if (!is_dir($path)) {
-            mkdir($path, $this->chmod, true);
-        }
+
+        // A more atomic option when creating directories
+        @mkdir($path, $this->chmod, true);
 
         $cacheValue = $this->createCacheValue($key, $value, $ttl);
         $content = var_export($cacheValue, true);
         $content = '<?php return ' . $content . ';';
 
+        // Open the file for writing only. If the file does not exist, it is created.
+        // If it exists, it is neither truncated, nor the call to this function fails.
+        $fp = fopen($cacheFile, 'c');
+
         // Acquire an exclusive lock on the file while proceeding to the writing.
-        // In other words, a flock() call happens between the fopen() call and the fwrite() call.
-        file_put_contents($cacheFile, $content, LOCK_EX);
+        if (flock($fp, LOCK_EX)) {
+            ftruncate($fp, 0);
+            fwrite($fp, $content);
 
-        // opcache will only compile and cache files older than the script execution start.
-        // set a date before the script execution date, then opcache will compile and cache the generated file.
-        touch($cacheFile, time() - $this->fileModifiedOffset);
+            // opcache will only compile and cache files older than the script execution start.
+            // set a date before the script execution date, then opcache will compile and cache the generated file.
+            touch($cacheFile, time() - $this->fileModifiedOffset);
 
-        // This php extension is not enabled by default on windows. We must check it.
-        if ($this->hasCompileFile) {
-            opcache_invalidate($cacheFile);
-            opcache_compile_file($cacheFile);
+            // This php extension is not enabled by default on windows. We must check it.
+            if ($this->hasCompileFile) {
+                opcache_invalidate($cacheFile);
+                opcache_compile_file($cacheFile);
+            }
+
+            // Release the lock
+            flock($fp, LOCK_UN);
+        } else {
+            throw new RuntimeException(sprintf("Couldn't get the lock for key: %s", $key));
         }
+
+        fclose($fp);
 
         return true;
     }
@@ -113,8 +127,9 @@ class OpCache implements CacheInterface
     public function get($key, $default = null)
     {
         if (!is_string($key)) {
-            throw new InvalidArgumentException();
+            throw new InvalidArgumentException('Invalid key');
         }
+
         $filename = $this->getFilename($key);
         if (!file_exists($filename)) {
             return $default;
@@ -201,6 +216,7 @@ class OpCache implements CacheInterface
         if (!is_string($key)) {
             throw new InvalidArgumentException();
         }
+
         $filename = $this->getFilename($key);
         if (!file_exists($filename)) {
             return false;

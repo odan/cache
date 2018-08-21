@@ -69,6 +69,11 @@ Then unserialize the string back to the original value:
 $object = unserialize($cache->get('key'));
 ```
 
+### Race conditions
+
+If you're in a high-concurrency environment you should avoid using a filesystem cache. 
+Multiple operations on the file system are very hard to make atomic in PHP.
+
 ## Alternative OPcache implementations
 
 * [Symonfy Php Files Cache Adapter](https://symfony.com/doc/current/components/cache/adapters/php_files_adapter.html)
