@@ -76,4 +76,5 @@ Multiple operations on the file system are very hard to make atomic in PHP.
 
 ## Alternative OPcache implementations
 
+* [laminas/laminas-cache](https://docs.laminas.dev/laminas-cache/psr16/) - See the Filesystem Adapter
 * [Symonfy Php Files Cache Adapter](https://symfony.com/doc/current/components/cache/adapters/php_files_adapter.html)
