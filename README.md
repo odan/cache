@@ -28,7 +28,6 @@ Once the PHP script has been compiled to opcodes, those will be kept in RAM -- a
 
 * https://blog.graphiq.com/500x-faster-caching-than-redis-memcache-apc-in-php-hhvm-dcd26e8447ad#.tsokdw9d4
 * https://github.com/TerryE/opcache/wiki/The-Zend-Engine-and-opcode-caching#opcode-caching-with-opcache
-* https://juokaz.com/blog/from-php-to-machine-code
 
 ## Installation
 
@@ -74,7 +73,7 @@ $object = unserialize($cache->get('key'));
 If you're in a high-concurrency environment you should avoid using a filesystem cache. 
 Multiple operations on the file system are very hard to make atomic in PHP.
 
-## Alternative OPcache implementations
+## Similar components
 
 * [laminas/laminas-cache](https://docs.laminas.dev/laminas-cache/psr16/) - See the Filesystem Adapter
 * [Symonfy Php Files Cache Adapter](https://symfony.com/doc/current/components/cache/adapters/php_files_adapter.html)
