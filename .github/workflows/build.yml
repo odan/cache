@@ -20,6 +20,7 @@ jobs:
         with:
           php-version: ${{ matrix.php-versions }}
           extensions: opcache
+          ini-values: 'zend_extension=opcache, opcache.enable=1, opcache.enable_cli=1'
           coverage: none
 
       - name: Check PHP Version
