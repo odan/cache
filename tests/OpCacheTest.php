@@ -86,7 +86,7 @@ class OpCacheTest extends ArrayCacheTest
         $this->assertTrue(isset($status2['scripts'][$cacheFile]));
 
         $this->cache->delete($key);
-        $this->assertFileDoesNotExist($cacheFile);
+        $this->assertFileNotExists($cacheFile);
     }
 
     /**
@@ -101,8 +101,8 @@ class OpCacheTest extends ArrayCacheTest
         $sha1 = sha1($key);
 
         return $this->path . DIRECTORY_SEPARATOR . substr($sha1, 0, 2) . DIRECTORY_SEPARATOR . substr(
-            $sha1,
-            2
-        ) . '.php';
+                $sha1,
+                2
+            ) . '.php';
     }
 }
