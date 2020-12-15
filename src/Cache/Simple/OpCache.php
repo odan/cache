@@ -13,7 +13,7 @@ use RuntimeException;
 use Traversable;
 
 /**
- * OpCache (PSR-16)
+ * OpCache (PSR-16).
  *
  * OPcache improves PHP performance by storing precompiled script bytecode
  * in shared memory, thereby removing the need for PHP to load and
@@ -22,21 +22,21 @@ use Traversable;
 class OpCache implements CacheInterface
 {
     /**
-     * Cache path
+     * Cache path.
      *
      * @var string
      */
     protected $path = '';
 
     /**
-     * Status
+     * Status.
      *
      * @var bool Status
      */
     protected $hasCompileFile = false;
 
     /**
-     * File modification time
+     * File modification time.
      *
      * @var int File modification time in seconds
      */
@@ -50,7 +50,7 @@ class OpCache implements CacheInterface
     protected $chmod = 0775;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param string $path Cache path
      */
@@ -59,7 +59,7 @@ class OpCache implements CacheInterface
         if (isset($path)) {
             $this->path = $path;
         } else {
-            $this->path = sys_get_temp_dir() . '/cache';
+            $this->path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'cache';
         }
 
         // A more atomic option when creating directories
@@ -91,32 +91,18 @@ class OpCache implements CacheInterface
         $content = var_export($cacheValue, true);
         $content = '<?php return ' . $content . ';';
 
-        // Open the file for writing only. If the file does not exist, it is created.
-        // If it exists, it is neither truncated, nor the call to this function fails.
-        $fp = fopen($cacheFile, 'c');
-
         // Acquire an exclusive lock on the file while proceeding to the writing.
-        if (flock($fp, LOCK_EX)) {
-            ftruncate($fp, 0);
-            fwrite($fp, $content);
+        file_put_contents($cacheFile, $content, LOCK_EX);
 
-            // opcache will only compile and cache files older than the script execution start.
-            // set a date before the script execution date, then opcache will compile and cache the generated file.
-            touch($cacheFile, time() - $this->fileModifiedOffset);
+        // opcache will only compile and cache files older than the script execution start.
+        // set a date before the script execution date, then opcache will compile and cache the generated file.
+        touch($cacheFile, time() - $this->fileModifiedOffset);
 
-            // This php extension is not enabled by default on windows. We must check it.
-            if ($this->hasCompileFile) {
-                opcache_invalidate($cacheFile);
-                opcache_compile_file($cacheFile);
-            }
-
-            // Release the lock
-            flock($fp, LOCK_UN);
-        } else {
-            throw new RuntimeException(sprintf("Couldn't get the lock for key: %s", $key));
+        // This php extension is not enabled by default on windows. We must check it.
+        if ($this->hasCompileFile) {
+            opcache_invalidate($cacheFile);
+            opcache_compile_file($cacheFile);
         }
-
-        fclose($fp);
 
         return true;
     }
@@ -137,6 +123,11 @@ class OpCache implements CacheInterface
 
         // Acquire a read lock (shared locked)
         $myfile = fopen($filename, 'rt');
+
+        if ($myfile === false) {
+            throw new RuntimeException(sprintf('File could not be read: %s', $filename));
+        }
+
         flock($myfile, LOCK_SH);
 
         $cacheValue = include $filename;
@@ -149,9 +140,7 @@ class OpCache implements CacheInterface
             return $default;
         }
 
-        $result = isset($cacheValue['value']) ? $cacheValue['value'] : $default;
-
-        return $result;
+        return $cacheValue['value'] ?? $default;
     }
 
     /**
@@ -163,7 +152,7 @@ class OpCache implements CacheInterface
             throw new InvalidArgumentException();
         }
 
-        $result = array();
+        $result = [];
         foreach ((array)$keys as $key) {
             $result[$key] = $this->has($key) ? $this->get($key) : $default;
         }
@@ -263,43 +252,49 @@ class OpCache implements CacheInterface
      * Get cache filename.
      *
      * @param string $key Key
+     *
      * @return string Filename
      */
-    protected function getFilename($key)
+    protected function getFilename(string $key): string
     {
         $sha1 = sha1($key);
-        $result = $this->path . '/' . substr($sha1, 0, 2) . '/' . substr($sha1, 2) . '.php';
 
-        return $result;
+        return $this->path . DIRECTORY_SEPARATOR . substr($sha1, 0, 2) . DIRECTORY_SEPARATOR . substr(
+                $sha1,
+                2
+            ) . '.php';
     }
 
     /**
      * Creates a cache value object.
      *
-     * @param string $key The cache key the file is stored under.
+     * @param string $key The cache key the file is stored under
      * @param mixed $value The data being stored
      * @param int|null $ttl The timestamp of when the data will expire. If null, the data won't expire.
+     *
      * @return array Cache value
      */
-    protected function createCacheValue($key, $value, $ttl = null)
+    protected function createCacheValue($key, $value, $ttl = null): array
     {
         $created = time();
 
-        return array(
+        return [
             'created' => $created,
             'key' => $key,
             'value' => $value,
             'ttl' => $ttl,
-            'expires' => ($ttl) ? $created + $ttl : null
-        );
+            'expires' => ($ttl) ? $created + $ttl : null,
+        ];
     }
 
     /**
      * Checks if a value is expired.
      *
-     * @return bool True if the value is expired.
+     * @param mixed $expires
+     *
+     * @return bool true if the value is expired
      */
-    protected function isExpired($expires)
+    protected function isExpired($expires): bool
     {
         // value doesn't expire
         if (!$expires) {

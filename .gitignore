@@ -8,3 +8,4 @@ cache.properties
 .php_cs.cache
 vendor/
 tmp/
+.phpunit.result.cache

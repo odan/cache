@@ -9,16 +9,16 @@ use Psr\SimpleCache\CacheInterface;
 use Traversable;
 
 /**
- * ArrayCache (PSR-16)
+ * ArrayCache (PSR-16).
  */
 class ArrayCache implements CacheInterface
 {
     /**
-     * Array cache
+     * Array cache.
      *
      * @var array
      */
-    protected $data = array();
+    protected $data = [];
 
     /**
      * {@inheritdoc}
@@ -72,7 +72,7 @@ class ArrayCache implements CacheInterface
             throw new InvalidArgumentException();
         }
 
-        $result = array();
+        $result = [];
         foreach ((array)$keys as $key) {
             $result[$key] = $this->has($key) ? $this->get($key) : $default;
         }
@@ -153,7 +153,7 @@ class ArrayCache implements CacheInterface
      */
     public function clear()
     {
-        $this->data = array();
+        $this->data = [];
 
         return true;
     }
@@ -161,26 +161,30 @@ class ArrayCache implements CacheInterface
     /**
      * Creates a FileSystemCacheValue object.
      *
-     * @param string $key The cache key the file is stored under.
+     * @param string $key the cache key the file is stored under
      * @param mixed $value The data being stored
      * @param int $ttl The timestamp of when the data will expire. If null, the data won't expire.
+     *
      * @return array Cache value
      */
     protected function createCacheValue($key, $value, $ttl = null)
     {
         $created = time();
 
-        return array(
+        return [
             'created' => $created,
             'key' => $key,
             'value' => $value,
             'ttl' => $ttl,
-            'expires' => ($ttl) ? $created + $ttl : null
-        );
+            'expires' => ($ttl) ? $created + $ttl : null,
+        ];
     }
 
     /**
-     * Checks if a value is expired
+     * Checks if a value is expired.
+     *
+     * @param mixed $expires
+     *
      * @return bool True if the value is expired.  False if it is not.
      */
     protected function isExpired($expires)

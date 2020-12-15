@@ -1,25 +1,24 @@
 <?php
 
-namespace Odan\Test;
+namespace Odan\Cache\Test;
 
 use Odan\Cache\Simple\ArrayCache;
 use PHPUnit\Framework\TestCase;
 use Psr\SimpleCache\CacheInterface;
 
 /**
- * OpCacheTest
+ * OpCacheTest.
  *
  * @coversDefaultClass \Odan\Cache\Simple\ArrayCache
  */
 class ArrayCacheTest extends TestCase
 {
-
     /**
      * @var CacheInterface
      */
     protected $cache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cache = new ArrayCache();
         $this->cache->clear();
@@ -28,7 +27,7 @@ class ArrayCacheTest extends TestCase
     /**
      * Test.
      */
-    public function testInstanceOf()
+    public function testInstanceOf(): void
     {
         $this->assertInstanceOf(ArrayCache::class, $this->cache);
     }
@@ -36,7 +35,7 @@ class ArrayCacheTest extends TestCase
     /**
      * Test.
      */
-    public function testHasByStringKey()
+    public function testHasByStringKey(): void
     {
         $this->cache->set('key', 'value');
         sleep(1);
@@ -45,16 +44,15 @@ class ArrayCacheTest extends TestCase
 
     /**
      * Test exception.
-     *
-     * @expectedException \Psr\SimpleCache\InvalidArgumentException
-     * @expectedExceptionMessage_ Cannot throw objects that do not implement Throwable
      */
-    public function testGetInvalidKey()
+    public function testGetInvalidKey(): void
     {
+        $this->expectException(\Psr\SimpleCache\InvalidArgumentException::class);
+
         $this->cache->get(1, 'value');
     }
 
-    public function testGetByStringKey()
+    public function testGetByStringKey(): void
     {
         $this->cache->set('strkey', 'str key value');
         sleep(1);
@@ -63,16 +61,14 @@ class ArrayCacheTest extends TestCase
 
     /**
      * Test exception.
-     *
-     * @expectedException \Psr\SimpleCache\InvalidArgumentException
-     * @expectedExceptionMessage_ Cannot throw objects that do not implement Throwable
      */
-    public function testSetByIntKey()
+    public function testSetByIntKey(): void
     {
+        $this->expectException(\Psr\SimpleCache\InvalidArgumentException::class);
         $this->cache->set(2, 'value 2');
     }
 
-    public function testDelete()
+    public function testDelete(): void
     {
         $this->cache->set('fordeletekey', 'value');
         sleep(1);
@@ -81,34 +77,34 @@ class ArrayCacheTest extends TestCase
         $this->assertFalse($this->cache->has('fordeletekey'));
     }
 
-    public function testHasStringKey()
+    public function testHasStringKey(): void
     {
         $this->cache->set('key', 'value');
         sleep(1);
         $this->assertTrue($this->cache->has('key'));
     }
 
-    public function testHasNotExistsStringKey()
+    public function testHasNotExistsStringKey(): void
     {
         $this->assertFalse($this->cache->has('somethingkey'));
     }
 
-    public function testGetByStringKeyWithDefaultValue()
+    public function testGetByStringKeyWithDefaultValue(): void
     {
         $this->assertEquals('default value', $this->cache->get('somenotexistingkey', 'default value'));
     }
 
-    public function testGetByArrayKeyWithDefaultValue()
+    public function testGetByArrayKeyWithDefaultValue(): void
     {
-        $this->assertEquals(array('table', '3'), $this->cache->get('somenotexistingkey', array('table', '3')));
+        $this->assertEquals(['table', '3'], $this->cache->get('somenotexistingkey', ['table', '3']));
     }
 
     /**
      * Test.
      */
-    public function testMultiple()
+    public function testMultiple(): void
     {
-        $values = array('key' => 'value', 'key2' => 'value2');
+        $values = ['key' => 'value', 'key2' => 'value2'];
         $keys = array_keys($values);
 
         $this->cache->setMultiple($values);

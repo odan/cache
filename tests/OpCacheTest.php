@@ -1,12 +1,12 @@
 <?php
 
-namespace Odan\Test;
+namespace Odan\Cache\Test;
 
 use Odan\Cache\Simple\OpCache;
 use Psr\SimpleCache\CacheInterface;
 
 /**
- * OpCacheTest
+ * OpCacheTest.
  *
  * @coversDefaultClass \Odan\Cache\Simple\OpCache
  *
@@ -23,7 +23,6 @@ use Psr\SimpleCache\CacheInterface;
  * [opcache]
  * opcache.enable=1
  * opcache.enable_cli=1
- *
  */
 class OpCacheTest extends ArrayCacheTest
 {
@@ -37,9 +36,9 @@ class OpCacheTest extends ArrayCacheTest
      */
     protected $path;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->path = dirname(__DIR__) . '/tmp/opcache';
+        $this->path = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . 'opcache';
         if (!file_exists($this->path)) {
             mkdir($this->path, 0775, true);
         }
@@ -51,19 +50,31 @@ class OpCacheTest extends ArrayCacheTest
     /**
      * Test.
      */
-    public function testInstanceOf()
+    public function testInstanceOf(): void
     {
         $this->assertInstanceOf(OpCache::class, $this->cache);
     }
 
-    public function testOpCacheExtension()
+    public function testOpCacheExtension(): void
     {
+        // php.ini:
+        // zend_extension=opcache
+        // opcache.enable=1
+        // opcache.enable_cli=1
         $this->assertTrue(function_exists('opcache_compile_file'));
+
+        // If the opcache is disabled, this functions returns false.
+        $this->assertNotFalse(opcache_get_status());
     }
 
-    public function testOpCacheFile()
+    public function testOpCacheFile(): void
     {
         $key = 'op_cache_test_key';
+        $cacheFile = $this->getCacheFilename($key);
+
+        $status = opcache_get_status();
+        $this->assertFalse(isset($status['scripts'][$cacheFile]));
+
         $this->cache->set($key, 'value');
         sleep(1);
 
@@ -71,21 +82,27 @@ class OpCacheTest extends ArrayCacheTest
         $this->assertFileExists($cacheFile);
         $this->assertTrue(opcache_is_script_cached($cacheFile));
 
+        $status2 = opcache_get_status();
+        $this->assertTrue(isset($status2['scripts'][$cacheFile]));
+
         $this->cache->delete($key);
-        $this->assertFileNotExists($cacheFile);
+        $this->assertFileDoesNotExist($cacheFile);
     }
 
     /**
      * Get cache filename.
      *
      * @param string $key Key
+     *
      * @return string Filename
      */
-    protected function getCacheFilename($key)
+    protected function getCacheFilename(string $key): string
     {
         $sha1 = sha1($key);
-        $result = $this->path . '/' . substr($sha1, 0, 2) . '/' . substr($sha1, 2) . '.php';
 
-        return $result;
+        return $this->path . DIRECTORY_SEPARATOR . substr($sha1, 0, 2) . DIRECTORY_SEPARATOR . substr(
+            $sha1,
+            2
+        ) . '.php';
     }
 }
