@@ -12,7 +12,11 @@ tools:
 
 build:
     environment:
-        php: 7.4
+        php:
+            version: '7.4'
+            ini:
+                'opcache.enable': '1'
+                'opcache.enable_cli': '1'
         mysql: false
         node: false
         postgresql: false
